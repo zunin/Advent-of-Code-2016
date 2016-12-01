@@ -11,8 +11,8 @@ class Direction(IntEnum):
 
 
 Coordinate = namedtuple('Coordinate', 'x y')
-
 Instruction = namedtuple('Instruction', 'direction length')
+
 
 class InputParser:
 
@@ -38,28 +38,60 @@ class InputParser:
                         length=raw_direction[2]
                     )
 
-    def parse(self):
+    def _parse_instruction_to_coordinate(self, old_position, instruction, length):
+        length = int(length)
+        x = int(old_position.x)
+        y = int(old_position.y)
+
+        if instruction.direction is Direction.North:
+            current_position = Coordinate(x=x, y=y + length)
+        elif instruction.direction is Direction.East:
+            current_position = Coordinate(x=x + length, y=y)
+        elif instruction.direction is Direction.South:
+            current_position = Coordinate(x=x, y=y - length)
+        else:  # direction is West
+            current_position = Coordinate(x=x - length, y=y)
+        return current_position
+
+    def get_final_position(self):
         current_position = Coordinate(x=0, y=0)
         for instruction in self._instructions():
-            length = int(instruction.length)
-            x = int(current_position.x)
-            y = int(current_position.y)
-
-            if instruction.direction is Direction.North:
-                current_position = Coordinate(x=x, y=y + length)
-            elif instruction.direction is Direction.East:
-                current_position = Coordinate(x=x + length, y=y)
-            elif instruction.direction is Direction.South:
-                current_position = Coordinate(x=x, y=y - length)
-            else: # direction is West
-                current_position = Coordinate(x=x - length, y=y)
+                current_position = self._parse_instruction_to_coordinate(
+                    current_position, instruction, instruction.length
+                )
 
         return current_position
 
+    def _get_all_locations(self):
+        current_position = Coordinate(x=0, y=0)
+        for instruction in self._instructions():
+                length = int(instruction.length)
+                while length > 0:
+                    current_position = self._parse_instruction_to_coordinate(current_position, instruction, 1)
+                    yield current_position
+                    length -= 1
+
+    def get_first_position_visited_twice(self):
+        grid = {Coordinate(0, 0): 1}
+
+        for position in self._get_all_locations():
+            grid[position] = grid.get(position, 0) + 1
+            if grid[position] >= 2:
+                return position
+
+        return None
+
 
 def main():
-    final_destionation = InputParser("input.txt").parse()
-    print("End is {blocks_away} blocks away".format(blocks_away=final_destionation.x+final_destionation.y))
+    input_parser = InputParser("input.txt")
+    final_destination = input_parser.get_final_position()
+    print("End is {blocks_away} blocks away".format(blocks_away=final_destination.x+final_destination.y))
 
-if  __name__ =='__main__':
+    position_visited_twice = input_parser.get_first_position_visited_twice()
+    print("Real position is {blocks_away} blocks away".format(
+        blocks_away=position_visited_twice.x+position_visited_twice.y)
+    )
+
+
+if __name__ == '__main__':
     main()
