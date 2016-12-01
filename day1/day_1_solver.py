@@ -28,12 +28,10 @@ class InputParser:
                 for raw_instruction in raw_instructions:
                     raw_direction = re.split("(R|L)", raw_instruction)
 
-
                     value_addition = 1 if raw_direction[1] is "R" else -1
 
                     new_direction = Direction((current_direction.value + value_addition) % 4)
                     current_direction = new_direction
-
 
                     yield Instruction(
                         direction= new_direction,
@@ -42,16 +40,16 @@ class InputParser:
 
     def parse(self):
         current_position = Coordinate(x=0, y=0)
-        for instrution in self._instructions():
-            length = int(instrution.length)
+        for instruction in self._instructions():
+            length = int(instruction.length)
             x = int(current_position.x)
             y = int(current_position.y)
 
-            if instrution.direction is Direction.North:
+            if instruction.direction is Direction.North:
                 current_position = Coordinate(x=x, y=y + length)
-            elif instrution.direction is Direction.East:
+            elif instruction.direction is Direction.East:
                 current_position = Coordinate(x=x + length, y=y)
-            elif instrution.direction is Direction.South:
+            elif instruction.direction is Direction.South:
                 current_position = Coordinate(x=x, y=y - length)
             else: # direction is West
                 current_position = Coordinate(x=x - length, y=y)
