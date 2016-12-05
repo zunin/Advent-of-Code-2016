@@ -2,6 +2,8 @@ import re
 from collections import namedtuple
 from enum import IntEnum
 
+from common import BaseInputParser
+
 
 class Direction(IntEnum):
     North = 0
@@ -14,29 +16,25 @@ Coordinate = namedtuple('Coordinate', 'x y')
 Instruction = namedtuple('Instruction', 'direction length')
 
 
-class InputParser:
-
-    def __init__(self, file_name):
-        self.file_name = file_name
+class InputParser(BaseInputParser):
 
     def _instructions(self):
-        with open(self.file_name, "rt") as input_file:
-            current_direction = Direction.North
-            for line in input_file:
-                raw_instructions = [instruction.strip() for instruction in line.split(",")]
+        current_direction = Direction.North
+        for line in self.lines:
+            raw_instructions = [instruction.strip() for instruction in line.split(",")]
 
-                for raw_instruction in raw_instructions:
-                    raw_direction = re.split("(R|L)", raw_instruction)
+            for raw_instruction in raw_instructions:
+                raw_direction = re.split("(R|L)", raw_instruction)
 
-                    value_addition = 1 if raw_direction[1] is "R" else -1
+                value_addition = 1 if raw_direction[1] is "R" else -1
 
-                    new_direction = Direction((current_direction.value + value_addition) % 4)
-                    current_direction = new_direction
+                new_direction = Direction((current_direction.value + value_addition) % 4)
+                current_direction = new_direction
 
-                    yield Instruction(
-                        direction= new_direction,
-                        length=raw_direction[2]
-                    )
+                yield Instruction(
+                    direction= new_direction,
+                    length=raw_direction[2]
+                )
 
     def _parse_instruction_to_coordinate(self, old_position, instruction, length):
         length = int(length)
