@@ -1,4 +1,5 @@
 import re
+import string
 from collections import namedtuple, Counter
 from operator import itemgetter
 
@@ -17,6 +18,12 @@ class InputParser(BaseInputParser):
                 sector_id=dash_split[-1],
                 checksum=raw_split[1][1:-1]
             )
+
+    @property
+    def valid_rooms(self):
+        for room in self.rooms:
+            if RoomValidator.is_valid(room):
+                yield room
 
 
 class Room:
@@ -49,6 +56,17 @@ class RoomValidator:
         return calculated_checksum == room.data.checksum
 
 
+class RoomDecrypter:
+    @staticmethod
+    def _get_next_letter(character, rotation_number):
+       index = string.ascii_lowercase.index(character)
+       return string.ascii_lowercase[(index + rotation_number) % len(string.ascii_lowercase)]
+
+    def decrypt(room: Room):
+        name = "".join(room.data.encrypted_name)
+        return "".join([RoomDecrypter._get_next_letter(character, room.data.sector_id) for character in name])
+
+
 def main():
     parser = InputParser()
 
@@ -58,6 +76,11 @@ def main():
             id_sum += room.data.sector_id
 
     print("Id sum is %s" % id_sum)
+
+    for room in parser.valid_rooms:
+        if "north" in RoomDecrypter.decrypt(room):
+            print("Sector ID of North Pole Objects are in room '%s' in sector %s" %
+                  (RoomDecrypter.decrypt(room), room.data.sector_id))
 
 if __name__ == '__main__':
     main()
