@@ -21,6 +21,7 @@ class InputDecrypter:
     def get_least_common_letter(self, column):
         return Counter(''.join(column)).most_common()[-1][0]
 
+
 def main():
     parser = InputParser()
     decrypter = InputDecrypter()
