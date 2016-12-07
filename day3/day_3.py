@@ -1,6 +1,6 @@
 from collections import namedtuple
 
-from common import BaseInputParser
+from common import BaseInputParser, DataClass
 
 
 class InputParser(BaseInputParser):
@@ -32,21 +32,13 @@ class InputParser(BaseInputParser):
                 yield triangle
 
 
-class Triangle:
-    TriangleData = namedtuple("TriangleData", "a b c")
-
+class Triangle(DataClass):
     def __init__(self, a, b, c):
-        self.triangle = self.TriangleData(a=int(a), b=int(b), c=int(c))
+        super().__init__(a=int(a), b=int(b), c=int(c))
 
     def is_valid(self):
-        longest, middle, shortest = reversed(sorted(self.triangle))
+        longest, middle, shortest = reversed(sorted(self.data))
         return (shortest + middle) > longest
-
-    def __repr__(self):
-        return self.triangle.__repr__().replace(
-            self.TriangleData.__name__,
-            self.__class__.__name__
-        )
 
 
 def main():

@@ -3,7 +3,7 @@ import string
 from collections import namedtuple, Counter
 from operator import itemgetter
 
-from common import BaseInputParser
+from common import BaseInputParser, DataClass
 
 
 class InputParser(BaseInputParser):
@@ -26,20 +26,12 @@ class InputParser(BaseInputParser):
                 yield room
 
 
-class Room:
-    RoomData = namedtuple("RoomData", "encrypted_name sector_id checksum")
-
+class Room(DataClass):
     def __init__(self, encrypted_name, sector_id, checksum):
-        self.data = self.RoomData(
+        super().__init__(
             encrypted_name=encrypted_name,
             sector_id=int(sector_id),
             checksum=checksum
-        )
-
-    def __repr__(self):
-        return self.data.__repr__().replace(
-            self.RoomData.__name__,
-            self.__class__.__name__
         )
 
 
@@ -62,6 +54,7 @@ class RoomDecrypter:
        index = string.ascii_lowercase.index(character)
        return string.ascii_lowercase[(index + rotation_number) % len(string.ascii_lowercase)]
 
+    @staticmethod
     def decrypt(room: Room):
         name = "".join(room.data.encrypted_name)
         return "".join([RoomDecrypter._get_next_letter(character, room.data.sector_id) for character in name])

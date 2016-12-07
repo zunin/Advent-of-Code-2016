@@ -11,7 +11,6 @@ class InputParser(BaseInputParser):
 
 
 class MD5Hasher:
-
     def find_hash_with_prefix(self, id, prefix=0, prefix_length=5, password_length=8):
         part_1_password = []
         part_2_password = {}

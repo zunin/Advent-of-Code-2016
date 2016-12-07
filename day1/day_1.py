@@ -36,7 +36,8 @@ class InputParser(BaseInputParser):
                     length=raw_direction[2]
                 )
 
-    def _parse_instruction_to_coordinate(self, old_position, instruction, length):
+    @staticmethod
+    def _parse_instruction_to_coordinate(old_position, instruction, length):
         length = int(length)
         x = int(old_position.x)
         y = int(old_position.y)

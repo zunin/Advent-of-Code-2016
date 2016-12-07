@@ -1,7 +1,7 @@
 from collections import namedtuple
 from enum import Enum
 
-from common import BaseInputParser
+from common import BaseInputParser, DataClass
 
 
 class Direction(Enum):
@@ -17,24 +17,15 @@ class InputParser(BaseInputParser):
         for line in self.lines:
             yield [Direction(character) for character in line.split("\n")[0]]
 
-class Coordinate:
-    InnerCoordinate = namedtuple("InnerCoordinate", "x y")
 
+class Coordinate(DataClass):
     def __init__(self, x, y):
-        self.tuple = self.InnerCoordinate(x=x, y=y)
+        super().__init__(x=x, y=y)
 
     def limit(self, x_max=2, y_max=2, x_min=0, y_min=0):
-        x = min([max([self.tuple.x, x_min]), x_max])
-        y = min([max([self.tuple.y, y_min]), y_max])
-        self.tuple = self.InnerCoordinate(x=x, y=y)
-
-    @property
-    def x(self):
-        return self.tuple.x
-
-    @property
-    def y(self):
-        return self.tuple.y
+        x = min([max([self.x, x_min]), x_max])
+        y = min([max([self.y, y_min]), y_max])
+        self.data = self.model(x=x, y=y)
 
     def __add__(self, other: Direction):
         if other is Direction.Up:
@@ -46,17 +37,6 @@ class Coordinate:
         else:  # Right
             return Coordinate(x=self.x+1, y=self.y)
 
-    def __repr__(self):
-        return "%s(x=%s, y=%s)" % (self.__class__.__name__, self.x, self.y)
-
-    def __eq__(self, other):
-        return self.tuple.__eq__(other.tuple)
-
-    def __lt__(self, other):
-        return self.tuple.__lt__(other.tuple)
-
-    def __hash__(self):
-        return self.tuple.__hash__()
 
 class Keypad:
     keys = [

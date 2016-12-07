@@ -1,7 +1,7 @@
 import re
 from collections import namedtuple
 
-from common import BaseInputParser
+from common import BaseInputParser, DataClass
 
 
 class InputParser(BaseInputParser):
@@ -21,25 +21,9 @@ class InputParser(BaseInputParser):
             yield IPAddress(supernets=supernets, hypernets=hypernets)
 
 
-class IPAddress:
-    model = namedtuple("IPAddress", ["supernets", "hypernets"])
-
+class IPAddress(DataClass):
     def __init__(self, supernets, hypernets):
-        self.data = self.model(supernets=supernets, hypernets=hypernets)
-
-    @property
-    def supernets(self):
-        return self.data.supernets
-
-    @property
-    def hypernets(self):
-        return self.data.hypernets
-
-    def __repr__(self):
-        return self.data.__repr__().replace(
-            self.model.__name__,
-            self.__class__.__name__
-        )
+        super().__init__(supernets=supernets, hypernets=hypernets)
 
 
 class Validator:
